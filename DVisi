@@ -1,0 +1,74 @@
+<html>
+        <head>
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+          </script>
+        </head>
+        <body>
+          <h1>D'VISI</h1>
+          <h1>BACA SENSOR PIR (PASSIVE INFRARED) = <span id="pinsensor">No Data Yet(dummy)</span></h1>
+          <script>
+            function On(){
+              $.ajax({
+                url:'https://api.arkademy.com:8443/v0/arkana/device/IO/dvisi/gpio/control',
+                type : 'POST',
+                headers : {
+                          'accept' : 'application/json',
+                          'content-type' : 'application/json',
+                          'authorization' : 'Bearer MTE1NzEzOTM0MC4xNzk3NTA0Og=='
+                },
+                data : '{"controls":{"4":1}}', //data yang dikirimkan harus dalam STRING
+                success:function(response){
+                        //variabel response berisi data response dari API
+                },
+                error:function(err){
+                    //variabel err berisi data error dari API (404,401,400,500)
+                }
+              })
+            }
+            function Off(){
+              $.ajax({
+                url:'https://api.arkademy.com:8443/v0/arkana/device/IO/dvisi/gpio/control',
+                type : 'POST',
+                headers : {
+                          'accept' : 'application/json',
+                          'content-type' : 'application/json',
+                          'authorization' : 'Bearer MTE1NzEzOTM0MC4xNzk3NTA0Og=='
+                },
+                data : '{"controls":{"4":0}}', //data yang dikirimkan harus dalam STRING
+                success:function(response){
+                        //variabel response berisi data response dari API
+                },
+                error:function(err){
+                    //variabel err berisi data error dari API (404,401,400,500)
+                }
+              })
+            }
+            function Bacasensor(){
+              $.ajax({
+                url:'https://api.arkademy.com:8443/v0/arkana/device/IO/dvisi/gpio/data',
+                type : 'GET',
+                headers : {
+                  'accept' : 'application/json',
+                  'content-type' : 'application/json',
+                  'authorization' : 'Bearer MTE1NzEzOTM0MC4xNzk3NTA0Og=='
+                },
+                success:function(response){//success berisi response yang dikembalikan dari server jika tidak terjadi error.
+                  var nilaiPIR=response.data.result[5]; //membaca nilai sensor yang terpasang di pin 5
+                  if(nilaiPIR=="1"){//jika nilaiPIR adalah 1, maka relay sambungkan arus listrik (dengan eksekusi On() )
+                    On();
+                  }else if(nilaiPIR=="0"){//jika nilaiPIR adalah 0, maka relay putuskan arus listrik (dengan eksekusi Off() )
+                    Off();
+                  }
+                                                      $('#pinsensor').html(nilaiPIR);
+                },
+                error:function(err){
+                    //variabel err berisi data error dari API (404,401,400,500), misalnya 404 berarti error not found, 401 tidak memiliki username dan password yang tepat, dan 500 internal server error
+                }
+              })
+            }
+            setInterval(function(){//bentuk function tanpa nama seperti ini yang sering digunakan di javascript untuk menambah fleksibilitas
+              Bacasensor();
+            },5000);
+          </script>
+        </body>
+      </html>
